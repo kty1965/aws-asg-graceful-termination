@@ -64,7 +64,5 @@ export const handler = async (event, context, callback) => {
     });
   }
 
-  console.log(
-    `response from completeLifecycleAction: ${completeLifecycleAction}`
-  );
+  console.log(`response from completeLifecycleAction: ${JSON.stringify(ret)}`);
 };
