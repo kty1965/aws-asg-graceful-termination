@@ -30,6 +30,9 @@ export const handler = async (event, context, callback) => {
     clusterName,
     region,
   });
+  console.log(
+    `containerInstanceId: ${containerInstanceId} on cluster: ${clusterName}, ec2InstanceId: ${EC2InstanceId}`
+  );
 
   if (containerInstanceId == null || containerInstanceId == undefined) {
     console.log(
