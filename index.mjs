@@ -49,7 +49,7 @@ export const handler = async (event, context, callback) => {
     // arn:aws:ecs:${region}:${accountId}:container-instance/ecsCluster/${id}
     drainContainerInstance({
       clusterName,
-      containerInstanceId: containerInstanceId.slice(-1).pop(),
+      containerInstanceId: containerInstanceId.split("/").slice(-1).pop(),
       region,
     });
     console.log(`Waiting for draining ${env.afterDrainingWaitTimeSeconds}...`);
