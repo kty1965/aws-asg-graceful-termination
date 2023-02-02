@@ -35,6 +35,7 @@ export const updateContainerInstance = async ({
   clusterName,
   containerInstanceId,
   status,
+  region,
 }) => {
   const client = new ECSClient({ region });
   const command = new UpdateContainerInstancesStateCommand({
@@ -58,11 +59,13 @@ export const updateContainerInstance = async ({
 export const drainContainerInstance = async ({
   clusterName,
   containerInstanceId,
+  region,
 }) => {
   return updateContainerInstance({
     clusterName,
     containerInstanceId,
     status: ContainerInstanceStatus.DRAINING,
+    region,
   });
 };
 

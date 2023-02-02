@@ -60,11 +60,19 @@ Follow this reference [link](https://docs.aws.amazon.com/ko_kr/autoscaling/ec2/u
        {
          "Effect": "Allow",
          "Action": [
-           "ecs:ListContainerInstances",
+           "ecs:ListContainerInstances"
+         ],
+         "Resource": [
+           "arn:aws:ecs:${region}:${accountId}:cluster/*"
+         ]
+       },
+       {
+         "Effect": "Allow",
+         "Action": [
            "ecs:UpdateContainerInstancesState"
          ],
          "Resource": [
-           "arn:aws:autoscaling:${region}:${accountId}:cluster/*"
+           "arn:aws:ecs:${region}:${accountId}:container-instance/*/*"
          ]
        }
      ]

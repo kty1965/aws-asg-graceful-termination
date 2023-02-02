@@ -39,22 +39,24 @@ export const handler = async (event, context, callback) => {
       `containerInstanceId not found on cluster: ${clusterName}, ec2InstanceId: ${EC2InstanceId}`
     );
     ret = await completeLifecycleAction({
-      region: event.region,
+      region,
       autoScalingGroupName: AutoScalingGroupName,
       lifecycleHookName: LifecycleHookName,
       ec2InstanceId: EC2InstanceId,
       lifecycleActionToken: LifecycleActionToken,
     });
   } else if (containerInstanceId != null) {
+    // arn:aws:ecs:${region}:${accountId}:container-instance/ecsCluster/${id}
     drainContainerInstance({
       clusterName,
-      containerInstanceId,
+      containerInstanceId: containerInstanceId.slice(-1).pop(),
+      region,
     });
     console.log(`Waiting for draining ${env.afterDrainingWaitTimeSeconds}...`);
     await sleep(env.afterDrainingWaitTimeSeconds * 1000);
     console.log("draining waiting done");
     ret = await completeLifecycleAction({
-      region: event.region,
+      region,
       autoScalingGroupName: AutoScalingGroupName,
       lifecycleHookName: LifecycleHookName,
       ec2InstanceId: EC2InstanceId,
