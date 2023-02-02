@@ -22,10 +22,9 @@ export const handler = async (event, context, callback) => {
     NotificationMetadata,
   } = event.detail;
 
-  const metadata = JSON.parse(NotificationMetadata);
-  const { clusterName } = metadata;
+  const { clusterName } = NotificationMetadata;
 
-  const containerInstanceId = getContainerInstanceId({
+  const containerInstanceId = await getContainerInstanceId({
     instanceId: EC2InstanceId,
     clusterName,
     region,
@@ -34,11 +33,12 @@ export const handler = async (event, context, callback) => {
     `containerInstanceId: ${containerInstanceId} on cluster: ${clusterName}, ec2InstanceId: ${EC2InstanceId}`
   );
 
+  var ret;
   if (containerInstanceId == null || containerInstanceId == undefined) {
     console.log(
       `containerInstanceId not found on cluster: ${clusterName}, ec2InstanceId: ${EC2InstanceId}`
     );
-    await completeLifecycleAction({
+    ret = await completeLifecycleAction({
       region: event.region,
       autoScalingGroupName: AutoScalingGroupName,
       lifecycleHookName: LifecycleHookName,
@@ -53,7 +53,7 @@ export const handler = async (event, context, callback) => {
     console.log(`Waiting for draining ${env.afterDrainingWaitTimeSeconds}...`);
     await sleep(env.afterDrainingWaitTimeSeconds * 1000);
     console.log("draining waiting done");
-    await completeLifecycleAction({
+    ret = await completeLifecycleAction({
       region: event.region,
       autoScalingGroupName: AutoScalingGroupName,
       lifecycleHookName: LifecycleHookName,
@@ -61,4 +61,8 @@ export const handler = async (event, context, callback) => {
       lifecycleActionToken: LifecycleActionToken,
     });
   }
+
+  console.log(
+    `response from completeLifecycleAction: ${completeLifecycleAction}`
+  );
 };

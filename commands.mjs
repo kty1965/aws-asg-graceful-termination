@@ -1,50 +1,47 @@
-import {
-  AutoScalingClient,
-  CompleteLifecycleActionCommand,
-  CompleteLifecycleActionCommandInput,
-} from "@aws-sdk/client-auto-scaling";
+import clientAutoScaling from "@aws-sdk/client-auto-scaling";
+import clientECS from "@aws-sdk/client-ecs";
 
-import {
+const { AutoScalingClient, CompleteLifecycleActionCommand } = clientAutoScaling;
+const {
   ECSClient,
   ListContainerInstancesCommand,
-  ListContainerInstancesCommandInput,
   UpdateContainerInstancesStateCommand,
-  UpdateContainerInstancesStateCommandInput,
   ContainerInstanceStatus,
-} from "@aws-sdk/client-ecs"; // ES Modules import
+} = clientECS;
 
-const getContainerInstanceId = async ({ instanceId, clusterName, region }) => {
+export const getContainerInstanceId = async ({
+  instanceId,
+  clusterName,
+  region,
+}) => {
   const client = new ECSClient({ region });
-  const input = new ListContainerInstancesCommandInput({
+  const command = new ListContainerInstancesCommand({
     cluster: clusterName,
     filter: `attribute:instanceId==${instanceId}`,
   });
-  const command = new ListContainerInstancesCommand(input);
   var response;
   try {
     response = await client.send(command);
     const [containerInstanceArn] = response.containerInstanceArns;
     return containerInstanceArn;
   } catch (error) {
-    const { requestId, cfId, extendedRequestId } = error.$$metadata;
-    console.log({ requestId, cfId, extendedRequestId });
+    console.log(error);
     response = null;
   }
   return response;
 };
 
-const updateContainerInstance = async ({
+export const updateContainerInstance = async ({
   clusterName,
   containerInstanceId,
   status,
 }) => {
   const client = new ECSClient({ region });
-  const input = new UpdateContainerInstancesStateCommandInput({
+  const command = new UpdateContainerInstancesStateCommand({
     cluster: clusterName,
     containerInstances: [containerInstanceId],
     status,
   });
-  const command = new UpdateContainerInstancesStateCommand(input);
   var response;
   try {
     response = await client.send(command);
@@ -52,14 +49,16 @@ const updateContainerInstance = async ({
       response = null;
     }
   } catch (error) {
-    const { requestId, cfId, extendedRequestId } = error.$$metadata;
-    console.log({ requestId, cfId, extendedRequestId });
+    console.log(error);
     response = null;
   }
   return response;
 };
 
-const drainContainerInstance = async ({ clusterName, containerInstanceId }) => {
+export const drainContainerInstance = async ({
+  clusterName,
+  containerInstanceId,
+}) => {
   return updateContainerInstance({
     clusterName,
     containerInstanceId,
@@ -67,7 +66,7 @@ const drainContainerInstance = async ({ clusterName, containerInstanceId }) => {
   });
 };
 
-const completeLifecycleAction = async ({
+export const completeLifecycleAction = async ({
   region,
   autoScalingGroupName,
   lifecycleHookName,
@@ -75,22 +74,19 @@ const completeLifecycleAction = async ({
   lifecycleActionToken,
 }) => {
   const client = new AutoScalingClient({ region });
-
-  const input = new CompleteLifecycleActionCommandInput({
+  const command = new CompleteLifecycleActionCommand({
     AutoScalingGroupName: autoScalingGroupName,
     LifecycleHookName: lifecycleHookName,
     InstanceId: ec2InstanceId,
     LifecycleActionToken: lifecycleActionToken,
     /* required */ LifecycleActionResult: "CONTINUE",
   });
-  const command = new CompleteLifecycleActionCommand(input);
   var response;
 
   try {
     response = await client.send(command);
   } catch (error) {
-    const { requestId, cfId, extendedRequestId } = error.$$metadata;
-    console.log({ requestId, cfId, extendedRequestId });
+    console.log(error);
     response = null;
   }
   return response;
