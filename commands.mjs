@@ -13,7 +13,6 @@ import {
   ContainerInstanceStatus,
 } from "@aws-sdk/client-ecs"; // ES Modules import
 
-
 const getContainerInstanceId = async ({ instanceId, clusterName, region }) => {
   const client = new ECSClient({ region });
   const input = new ListContainerInstancesCommandInput({
@@ -48,7 +47,7 @@ const updateContainerInstance = async ({
   const command = new UpdateContainerInstancesStateCommand(input);
   var response;
   try {
-    response = await client.send(command);]
+    response = await client.send(command);
     if (response.failures.length > 0) {
       response = null;
     }
