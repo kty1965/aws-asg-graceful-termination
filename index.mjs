@@ -22,7 +22,17 @@ export const handler = async (event, context, callback) => {
     NotificationMetadata,
   } = event.detail;
 
-  const { clusterName } = NotificationMetadata;
+  var metadata;
+  if (
+    typeof NotificationMetadata === "string" ||
+    NotificationMetadata instanceof String
+  ) {
+    metadata = JSON.parse(NotificationMetadata);
+  } else {
+    metadata = NotificationMetadata;
+  }
+
+  const { clusterName } = metadata;
 
   const containerInstanceId = await getContainerInstanceId({
     instanceId: EC2InstanceId,
