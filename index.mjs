@@ -57,7 +57,7 @@ export const handler = async (event, context, callback) => {
     });
   } else if (containerInstanceId != null) {
     // arn:aws:ecs:${region}:${accountId}:container-instance/ecsCluster/${id}
-    drainContainerInstance({
+    await drainContainerInstance({
       clusterName,
       containerInstanceId: containerInstanceId.split("/").slice(-1).pop(),
       region,
